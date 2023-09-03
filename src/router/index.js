@@ -70,6 +70,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/reader',
+    component: Layout,
+    redirect: '/reader/list',
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/reader/index'),
+        meta: { title: '读者管理', icon: 'el-icon-s-help' }
+      }
+    ]
+  },
+  {
     path: '/form',
     component: Layout,
     children: [
