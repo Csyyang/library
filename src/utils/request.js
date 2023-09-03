@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
-
+import { getToken, removeUser, removeToken } from '@/utils/auth'
+import router, { resetRouter } from '@/router'
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
@@ -48,7 +48,7 @@ service.interceptors.response.use(
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== '00') {
       Message({
-        message: res.msg || 'Error',
+        message: res.msg || res.errors || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
@@ -66,13 +66,19 @@ service.interceptors.response.use(
       //     })
       //   })
       // }
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject(new Error(res || 'Error'))
     } else {
       return res
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    if (error.response.data.errors === '未登录') {
+      removeUser() // must remove  token  first
+      removeToken()
+      resetRouter()
+      store.commit('RESET_STATE')
+      router.push('/login')
+    }
     Message({
       message: error.message,
       type: 'error',

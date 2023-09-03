@@ -1,5 +1,5 @@
 import router from './router'
-import store from './store'
+// import store from './store'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import getPageTitle from '@/utils/get-page-title'
@@ -14,11 +14,10 @@ router.beforeEach(async(to, from, next) => {
 
   // set page title
   document.title = getPageTitle(to.meta.title)
-
   // determine whether the user has logged in
   // const hasToken = getToken()
-  const user = store.getters.user
-  if (user.name) {
+  const user = sessionStorage.getItem('user')
+  if (user) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
