@@ -83,18 +83,18 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/form',
+    path: '/administrators',
     component: Layout,
+    redirect: '/administrators/list',
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/administrators/index'),
+        meta: { title: '管理员', icon: 'el-icon-s-help' }
       }
     ]
   },
-
   {
     path: '/nested',
     component: Layout,
@@ -144,12 +144,6 @@ export const constantRoutes = [
             meta: { title: 'Menu1-3' }
           }
         ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
       }
     ]
   },
