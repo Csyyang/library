@@ -3,6 +3,10 @@ const getters = {
   device: state => state.app.device,
   token: state => state.user.token,
   avatar: state => state.user.avatar,
-  name: state => state.user.name
+  name: state => state.user.name,
+  user: state => {
+    const user = JSON.parse(sessionStorage.getItem('user'))
+    return user || state.user.user
+  }
 }
 export default getters
