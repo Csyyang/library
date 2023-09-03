@@ -68,6 +68,19 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/library',
+  //   component: Layout,
+  //   redirect: '/library/list',
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       name: 'List',
+  //       component: () => import('@/views/library/index'),
+  //       meta: { title: '借阅记录', icon: 'el-icon-s-help' }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/reader',

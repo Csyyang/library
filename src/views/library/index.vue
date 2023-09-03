@@ -62,7 +62,7 @@
 
       <el-table-column
         label="操作"
-        width="180"
+        width="240"
         fixed="right"
       >
         <template slot-scope="scope">
@@ -71,6 +71,22 @@
             size="mini"
             @click="handleEdit(scope.row)"
           >编辑</el-button>
+
+          <el-button
+            v-if="scope.row.status === '在库'"
+            class="btn"
+            size="mini"
+            type="primary"
+            @click="lend(scope.row)"
+          >借出</el-button>
+
+          <el-button
+            v-if="scope.row.status === '借出'"
+            class="btn"
+            size="mini"
+            type="primary"
+            @click="returnBook(scope.row)"
+          >归还</el-button>
 
           <el-popconfirm
             title="确认删除"
@@ -102,14 +118,21 @@
       :data="data"
       @refesh="getData"
     />
+
+    <lend
+      :visible.sync="LendVisible"
+      @refesh="getData"
+    />
   </div>
 </template>
 
 <script>
 import { getList, delBook } from '@/api/library'
 import addBook from './components/add.vue'
+import lend from './components/lend.vue'
+
 export default {
-  components: { addBook },
+  components: { addBook, lend },
   data() {
     return {
       tableData: [],
@@ -119,6 +142,7 @@ export default {
       },
       all: 0,
       dialogVisible: false,
+      LendVisible: false,
       data: {}
     }
   },
@@ -162,6 +186,13 @@ export default {
       })
 
       this.getData()
+    },
+    // 借出、归还
+    lend() {
+      this.LendVisible = true
+    },
+    returnBook() {
+
     }
   }
 }
