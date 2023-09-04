@@ -121,6 +121,7 @@
 
     <lend
       :visible.sync="LendVisible"
+      :data="lendData"
       @refesh="getData"
     />
   </div>
@@ -128,6 +129,7 @@
 
 <script>
 import { getList, delBook } from '@/api/library'
+import { upBorrowing } from '@/api/borrowing'
 import addBook from './components/add.vue'
 import lend from './components/lend.vue'
 
@@ -136,6 +138,7 @@ export default {
   data() {
     return {
       tableData: [],
+      lendData: null,
       searchForm: {
         size: 10,
         page: 1
@@ -188,11 +191,20 @@ export default {
       this.getData()
     },
     // 借出、归还
-    lend() {
+    lend(row) {
       this.LendVisible = true
+      this.lendData = row
     },
-    returnBook() {
+    async returnBook(row) {
+      await upBorrowing({
+        book_id: row.book_id
+      })
+      this.$message({
+        message: '归还成功',
+        type: 'success'
+      })
 
+      this.getData()
     }
   }
 }

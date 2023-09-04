@@ -68,10 +68,12 @@ export default {
       tableData: [],
       type: '',
       form: {
-        reader_id: ''
+        reader_id: '',
+        book_id: ''
       },
       rules: {
-        reader_id: [{ required: true, message: '请输入', trigger: 'blur' }]
+        reader_id: [{ required: true, message: '请输入', trigger: 'blur' }],
+        book_id: [{ required: true, message: '请输入', trigger: 'blur' }]
       }
     }
   },
@@ -96,6 +98,7 @@ export default {
     },
     async onSubmit() {
       await this.$refs.form.validate()
+      this.form.book_id = this.data.book_id
       await addBorrowing(this.form)
 
       this.$message({
