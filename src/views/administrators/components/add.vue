@@ -1,91 +1,78 @@
 <template>
   <el-dialog
-    :title="type === 'edit' ? '修改图书' : '新增图书'"
+    :title="type === 'edit' ? '修改管理员' : '新增管理员'"
     :visible.sync="dialogVisible"
     width="40%"
     :before-close="handleClose"
     :destroy-on-close="true"
   >
-    <el-form
-      ref="form"
-      :model="form"
-      label-width="80px"
-      :rules="rules"
-    >
-      <el-form-item
-        label="账号"
-        prop="username"
-      >
-        <el-input v-model="form.username" />
+    <el-form v-if="type === 'edit'" ref="form" :model="loginForm" label-width="80px" :rules="rules">
+      <el-form-item prop="username" label="用户名">
+        <el-input
+          ref="username"
+          v-model="loginForm.username"
+          placeholder="请输入"
+          name="username"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
 
-      <el-form-item
-        label="密码"
-        prop="password"
-      >
+      <el-form-item prop="password_hash" label="密码">
         <el-input
           :key="passwordType"
           ref="password"
-          v-model="form.password"
+          v-model="loginForm.password_hash"
           :type="passwordType"
           placeholder="请输入"
-          name="password"
+          name="password_hash"
           tabindex="2"
           auto-complete="on"
         >
-
-          <span
-            slot="suffix"
-            class="show-pwd"
-            @click="showPwd"
-          >
-            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          <span slot="suffix" class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password_hash' ? 'eye' : 'eye-open'" />
           </span>
         </el-input>
 
       </el-form-item>
-      <el-form-item
-        label="用户名"
-        prop="name"
-      >
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item
-        label="权限"
-        prop="role"
-      >
 
-        <el-select
-          v-model="form.role"
-          placeholder="请选择"
-        >
-          <el-option
-            label="超级管理员"
-            value="0"
-          /> <el-option
-            label="普通管理员"
-            value="1"
-          />
-        </el-select>
+      <el-form-item prop="first_name" label="姓氏">
+        <el-input v-model="loginForm.first_name" palceholder="请输入" />
+      </el-form-item>
+
+      <el-form-item prop="last_name" label="名字">
+        <el-input v-model="loginForm.last_name" palceholder="请输入" />
+      </el-form-item>
+
+      <el-form-item prop="email" label="邮件">
+        <el-input v-model="loginForm.email" palceholder="请输入" />
       </el-form-item>
 
     </el-form>
 
-    <span
-      slot="footer"
-      class="dialog-footer"
-    >
+    <el-form v-else ref="form" :model="loginForm" label-width="80px" :rules="rules">
+      <el-form-item prop="user_id" label="用户名">
+        <el-select v-model="loginForm.user_id" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.user_id"
+            :label="`${item.first_name}${item.last_name}`"
+            :value="item.user_id"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button
-        type="primary"
-        @click="onSubmit"
-      >确 定</el-button>
+      <el-button type="primary" @click="onSubmit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
-import { addAdmin, upAdmin } from '@/api/administrators'
+import { addAdmin, upAdmin, getUsers } from '@/api/administrators'
 
 export default {
   props: {
@@ -99,30 +86,38 @@ export default {
     }
   },
   data() {
+    const validateUsername = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入账号'))
+      } else {
+        callback()
+      }
+    }
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入密码'))
+      } else {
+        callback()
+      }
+    }
     return {
       passwordType: 'password',
       type: '',
-      form: {
-        title: '',
-        author: '',
-        publisher: '',
-        publish_date: null,
-        ISBN: '',
-        category: '',
-        description: '',
-        status: ''
+      loginForm: {
+        username: '',
+        password_hash: '',
+        first_name: '',
+        last_name: '',
+        email: ''
       },
       rules: {
-        title: [{ required: true, message: '请输入', trigger: 'blur' }],
-        author: [{ required: true, message: '请输入', trigger: 'blur' }],
-        publisher: [{ required: true, message: '请输入', trigger: 'blur' }],
-        publish_date: [{ required: true, message: '请选择', trigger: 'change' }],
-        ISBN: [{ required: true, message: '请输入', trigger: 'blur' }],
-        category: [{ required: true, message: '请输入', trigger: 'blur' }],
-        description: [{ required: true, message: '请输入', trigger: 'blur' }],
-        status: [{ required: true, message: '请选择', trigger: 'change' }]
-      }
-
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password_hash: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        first_name: [{ required: true, trigger: 'blur', message: '请输入' }],
+        last_name: [{ required: true, trigger: 'blur', message: '请输入' }],
+        user_id: [{ required: true, trigger: 'change', message: '请选择' }]
+      },
+      options: []
     }
   },
   computed: {
@@ -136,12 +131,22 @@ export default {
     }
   },
   created() {
-    if (this.data.name) {
-      this.form = Object.assign({}, this.form, this.data)
+    if (this.data.user_id) {
+      this.loginForm = Object.assign({}, this.loginForm, this.data)
       this.type = 'edit'
     }
+
+    this.getOption()
   },
   methods: {
+    async getOption() {
+      const res = await getUsers({
+        size: 10000,
+        page: 1
+      })
+
+      this.options = res.data
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -155,7 +160,7 @@ export default {
     async onSubmit() {
       await this.$refs.form.validate()
       const fn = this.type === 'edit' ? upAdmin : addAdmin
-      await fn(this.form)
+      await fn(this.loginForm)
 
       this.$message({
         message: this.type === 'edit' ? '修改成功' : '新增成功',

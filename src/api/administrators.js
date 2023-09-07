@@ -9,12 +9,20 @@ export function allAdmins(params) {
   })
 }
 
+export function getUsers(params) {
+  return request({
+    url: '/verify/suadmin/administrators/getUsers',
+    method: 'get',
+    params
+  })
+}
+
 // 新增
-export function addAdmin(data) {
+export function addAdmin(params) {
   return request({
     url: '/verify/suadmin/administrators/addAdmin',
-    method: 'post',
-    data
+    method: 'get',
+    params
   })
 }
 

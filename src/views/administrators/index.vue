@@ -1,64 +1,26 @@
 <template>
   <div class="app-container">
-    <el-button
-      type="primary"
-      @click="onAddBook"
-    >添加管理员</el-button>
-    <el-table
-      :data="tableData"
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="name"
-        label="名称"
-        width="180"
-      />
-      <el-table-column
-        prop="username"
-        label="账号"
-        width="180"
-      />
-      <el-table-column
-        prop="password"
-        label="密码"
-        width="180"
-      >
+    <el-button type="primary" @click="onAddBook">添加管理员</el-button>
+    <el-table :data="tableData" style="width: 100%">
+      <el-table-column prop="username" label="账号" width="180" />
+      <el-table-column prop="password" label="密码" width="180">
         <template>
           *****
         </template>
-
       </el-table-column>
-      <el-table-column
-        prop="role"
-        width="180"
-        label="权限"
-      >
+      <el-table-column prop="name" label="姓名" width="180">
         <template slot-scope="scope">
-          {{ scope.row.role === '0' ? '超级管理员' : '普通管理员' }}
+          {{ scope.row.first_name + scope.row.last_name }}
         </template>
       </el-table-column>
+      <el-table-column prop="email" width="180" label="邮箱" />
 
-      <el-table-column
-        label="操作"
-        width="180"
-        fixed="right"
-      >
+      <el-table-column label="操作" width="180" fixed="right">
         <template slot-scope="scope">
-          <el-button
-            class="btn"
-            size="mini"
-            @click="handleEdit(scope.row)"
-          >编辑</el-button>
+          <el-button class="btn" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
 
-          <el-popconfirm
-            title="确认删除"
-            @onConfirm="onDelect(scope.row.admin_id)"
-          >
-            <el-button
-              slot="reference"
-              size="mini"
-              type="danger"
-            >删除</el-button>
+          <el-popconfirm title="确认删除" @onConfirm="onDelect(scope.row.user_id)">
+            <el-button slot="reference" size="mini" type="danger">删除</el-button>
           </el-popconfirm>
         </template>
       </el-table-column>
@@ -74,12 +36,7 @@
       @current-change="handleCurrentChange"
     />
 
-    <addBook
-      v-if="dialogVisible"
-      :visible.sync="dialogVisible"
-      :data="data"
-      @refesh="getData"
-    />
+    <addBook v-if="dialogVisible" :visible.sync="dialogVisible" :data="data" @refesh="getData" />
   </div>
 </template>
 
@@ -129,9 +86,9 @@ export default {
 
       this.openDialog()
     },
-    async onDelect(admin_id) {
+    async onDelect(user_id) {
       await delAdmin({
-        admin_id
+        user_id
       })
 
       this.$message({
