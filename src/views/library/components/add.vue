@@ -6,96 +6,60 @@
     :before-close="handleClose"
     :destroy-on-close="true"
   >
-    <el-form
-      ref="form"
-      :model="form"
-      label-width="80px"
-      :rules="rules"
-    >
-      <el-form-item
-        label="书籍标题"
-        prop="title"
-      >
+    <el-form ref="form" :model="form" label-width="120px" :rules="rules">
+      <el-form-item label="书籍标题" prop="title">
         <el-input v-model="form.title" />
       </el-form-item>
-      <el-form-item
-        label="作者"
-        prop="author"
-      >
+
+      <el-form-item label="作者" prop="author">
         <el-input v-model="form.author" />
       </el-form-item>
-      <el-form-item
-        label="出版社"
-        prop="publisher"
-      >
+
+      <el-form-item label="出版社" prop="publisher">
         <el-input v-model="form.publisher" />
       </el-form-item>
-      <el-form-item
-        label="出版日期"
-        prop="publish_date"
-      >
-        <el-date-picker
-          v-model="form.publish_date"
-          value-format="yyyy-MM-dd"
-          type="date"
-          placeholder="选择日期"
-        />
-      </el-form-item>
-      <el-form-item
-        label="国际标准书号"
-        prop="ISBN"
-      >
-        <el-input v-model="form.ISBN" />
-      </el-form-item>
-      <el-form-item
-        label="图书分类"
-        prop="category"
-      >
-        <el-input v-model="form.category" />
-      </el-form-item>
-      <el-form-item
-        label="书籍描述"
-        prop="description"
-      >
-        <el-input v-model="form.description" />
+
+      <el-form-item label="出版日期" prop="publication_date">
+        <el-date-picker v-model="form.publication_date" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" />
       </el-form-item>
 
-      <el-form-item
-        v-if="type === 'edit'"
-        label="书籍状态"
-        prop="status"
-      >
-        <el-select
-          v-model="form.status"
-          placeholder="请选择"
-        >
+      <el-form-item label="国际标准书号" prop="isbn">
+        <el-input v-model="form.isbn" />
+      </el-form-item>
+      <el-form-item label="call_number" prop="call_number">
+        <el-input v-model="form.call_number" />
+      </el-form-item>
+
+      <el-form-item label="图书分类" prop="category_id">
+        <el-select v-model="form.category_id" placeholder="请选择">
           <el-option
-            label="借出"
-            value="借出"
-          /> <el-option
-            label="在库"
-            value="在库"
+            v-for="item in options"
+            :key="item.category_id"
+            :label="item.category_name"
+            :value="item.category_id"
           />
         </el-select>
       </el-form-item>
 
+      <el-form-item label="可借阅数" prop="copies_available">
+        <el-input v-model="form.copies_available" />
+      </el-form-item>
+
+      <el-form-item label="库存" prop="copies_total">
+        <el-input v-model="form.copies_total" />
+      </el-form-item>
     </el-form>
 
-    <span
-      slot="footer"
-      class="dialog-footer"
-    >
+    <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button
-        type="primary"
-        @click="onSubmit"
-      >确 定</el-button>
+      <el-button type="primary" @click="onSubmit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import { addBook, updateBook } from '@/api/library'
+import { allCategory } from '@/api/category'
 
 export default {
   props: {
@@ -115,23 +79,24 @@ export default {
         title: '',
         author: '',
         publisher: '',
-        publish_date: null,
-        ISBN: '',
-        category: '',
-        description: '',
-        status: ''
+        publication_date: null,
+        isbn: '',
+        call_number: '',
+        category_id: '',
+        copies_available: '',
+        copies_total: ''
       },
       rules: {
         title: [{ required: true, message: '请输入', trigger: 'blur' }],
         author: [{ required: true, message: '请输入', trigger: 'blur' }],
         publisher: [{ required: true, message: '请输入', trigger: 'blur' }],
-        publish_date: [{ required: true, message: '请选择', trigger: 'change' }],
-        ISBN: [{ required: true, message: '请输入', trigger: 'blur' }],
-        category: [{ required: true, message: '请输入', trigger: 'blur' }],
-        description: [{ required: true, message: '请输入', trigger: 'blur' }],
-        status: [{ required: true, message: '请选择', trigger: 'change' }]
-      }
-
+        publication_date: [{ required: true, message: '请选择', trigger: 'change' }],
+        isbn: [{ required: true, message: '请输入', trigger: 'blur' }],
+        category_id: [{ required: true, message: '请选择', trigger: 'change' }],
+        copies_available: [{ required: true, message: '请输入', trigger: 'blur' }],
+        copies_total: [{ required: true, message: '请选择', trigger: 'change' }]
+      },
+      options: []
     }
   },
   computed: {
@@ -145,12 +110,20 @@ export default {
     }
   },
   created() {
+    this.getCarory()
     if (this.data.title) {
       this.form = Object.assign({}, this.form, this.data)
       this.type = 'edit'
     }
   },
   methods: {
+    async getCarory() {
+      const res = await allCategory({
+        size: 100000,
+        page: 1
+      })
+      this.options = res.data.list
+    },
     async onSubmit() {
       await this.$refs.form.validate()
       const fn = this.type === 'edit' ? updateBook : addBook
