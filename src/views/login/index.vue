@@ -35,7 +35,7 @@
         <el-input
           :key="passwordType"
           ref="password"
-          v-model="loginForm.password"
+          v-model="loginForm.password_hash"
           :type="passwordType"
           placeholder="Password"
           name="password"
@@ -43,10 +43,7 @@
           auto-complete="on"
           @keyup.enter.native="handleLogin"
         />
-        <span
-          class="show-pwd"
-          @click="showPwd"
-        >
+        <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
@@ -58,10 +55,9 @@
         @click.native.prevent="handleLogin"
       >登录</el-button>
 
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
+      <div class="tips">
+        <el-button type="text" style="margin-right:20px;" @click="$router.push('/register')">注册</el-button>
+      </div>
 
     </el-form>
   </div>
@@ -90,11 +86,11 @@ export default {
     return {
       loginForm: {
         username: 'root',
-        password: 'root'
+        password_hash: 'root'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password_hash: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
@@ -248,4 +244,5 @@ $light_gray: #eee;
     cursor: pointer;
     user-select: none;
   }
-}</style>
+}
+</style>
