@@ -72,6 +72,20 @@ export const constantRoutes = [
       }
     ]
   },
+
+  {
+    path: '/category',
+    component: Layout,
+    redirect: '/category/list',
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/category/index'),
+        meta: { title: '分类管理', icon: 'el-icon-s-help' }
+      }
+    ]
+  },
   // {
   //   path: '/library',
   //   component: Layout,
